@@ -28,7 +28,3 @@ This project is a simple WebGL-based line drawing application that allows users 
 
 1. Clone this repository or download the source code.
 2. Open the `index.html` file in a modern web browser that supports WebGL.
-
-## Contributing
-
-Contributions to improve the application are welcome. Please feel free to submit pull requests or open issues to discuss potential enhancements.
