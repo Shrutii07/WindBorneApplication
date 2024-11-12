@@ -7,6 +7,7 @@ This project is a simple WebGL-based line drawing application that allows users 
 
 ![Screenshot](https://github.com/Shrutii07/WindBorneApplication/blob/main/app.png)
 
+![Screenshot](https://github.com/Shrutii07/WindBorneApplication/blob/main/app2.png)
 
 ## Features
 
