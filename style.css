@@ -49,6 +49,14 @@ input[type="number"] {
     width: 60px;
 }
 
+input[type="color"] {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+}
+
 .canvas-container {
     border: 2px solid #333;
     border-radius: 4px;

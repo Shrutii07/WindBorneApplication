@@ -1,6 +1,5 @@
 const canvas = document.getElementById('glCanvas');
 const gl = canvas.getContext('webgl');
-
 canvas.width = 800;
 canvas.height = 400;
 
@@ -29,19 +28,16 @@ function compileShader(source, type) {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
-
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
         gl.deleteShader(shader);
         return null;
     }
-
     return shader;
 }
 
 const vertexShader = compileShader(vertexShaderSrc, gl.VERTEX_SHADER);
 const fragmentShader = compileShader(fragmentShaderSrc, gl.FRAGMENT_SHADER);
-
 const program = gl.createProgram();
 gl.attachShader(program, vertexShader);
 gl.attachShader(program, fragmentShader);
@@ -65,20 +61,17 @@ const uColor = gl.getUniformLocation(program, 'uColor');
 
 let points = [];
 let lineWidth = 2;
+let lineColor = [0, 0, 0, 1]; // Default black color
 
-// Helper function to convert pixel coordinates to normalized device coordinates (NDC)
 function pixelToNDC(x, y) {
-    console.log(x,y)
     return [
         (x / canvas.width) * 2 - 1,
-        -((y / canvas.height) * 2 - 1) // Flip the y-coordinate
+        -((y / canvas.height) * 2 - 1)
     ];
 }
 
-// Function to draw thick lines with adjustable width
 function drawThickLines() {
     const vertices = [];
-    
     for (let i = 0; i < points.length - 1; i++) {
         const [x1, y1] = points[i];
         const [x2, y2] = points[i + 1];
@@ -98,65 +91,59 @@ function drawThickLines() {
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniform4fv(uColor, [0, 0, 0, 1]); // Black color
+    gl.uniform4fv(uColor, lineColor);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 2);
 }
 
-// Function to add a point via user input coordinates
 function addUserPoint() {
     const xInput = document.getElementById('xCoord');
     const yInput = document.getElementById('yCoord');
-    
     const x = parseFloat(xInput.value);
     const y = parseFloat(yInput.value);
-    
     if (isNaN(x) || isNaN(y) || x < 0 || x > 800 || y < 0 || y > 400) {
         alert('Please enter valid coordinates. X should be between 0 and 800, Y should be between 0 and 400.');
         return;
     }
-    
     points.push(pixelToNDC(x, y));
     drawThickLines();
-    
     xInput.value = '';
     yInput.value = '';
 }
 
-// Function to generate a random point on the canvas
 function addRandomSegment() {
     const newX = Math.random() * canvas.width;
     const newY = Math.random() * canvas.height;
-    
     points.push(pixelToNDC(newX, newY));
-    
     drawThickLines();
 }
 
-// Function to clear the canvas and reset points
 function clearCanvas() {
     points = [];
-    
     gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
-// Event listener for adjusting line width via input slider
 document.getElementById('lineWidth').addEventListener('input', (event) => {
     lineWidth = parseInt(event.target.value);
-    
     document.getElementById('lineWidthValue').textContent = lineWidth;
-    
     drawThickLines();
 });
 
-// Event listener for adding a point by clicking on the canvas
+document.getElementById('lineColor').addEventListener('input', (event) => {
+    const hexColor = event.target.value;
+    lineColor = [
+        parseInt(hexColor.slice(1, 3), 16) / 255,
+        parseInt(hexColor.slice(3, 5), 16) / 255,
+        parseInt(hexColor.slice(5, 7), 16) / 255,
+        1
+    ];
+    drawThickLines();
+});
+
 canvas.addEventListener('click', (event) => {
     const rect = canvas.getBoundingClientRect();
-    
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    
     points.push(pixelToNDC(x, y));
-    
     drawThickLines();
 });
 
@@ -164,34 +151,33 @@ let isPressed = false;
 let mouseDownPos;
 
 document.addEventListener('mousedown', function(e) {
-   isPressed = true;
-   mouseDownPos = {
-      x: e.clientX - canvas.offsetLeft,
-      y: e.clientY - canvas.offsetTop
-   };
+    isPressed = true;
+    mouseDownPos = {
+        x: e.clientX - canvas.offsetLeft,
+        y: e.clientY - canvas.offsetTop
+    };
 });
 
 document.addEventListener('mouseup', function() {
-   isPressed = false;
+    isPressed = false;
 });
 
 document.addEventListener('mousemove', function(e) {
-   if (isPressed) {
-      let currentPos = {
-         x: e.clientX - canvas.offsetLeft,
-         y: e.clientY - canvas.offsetTop
-      };
-      
-      points.push(pixelToNDC(currentPos.x, currentPos.y));
-      drawThickLines();
-   }
+    if (isPressed) {
+        let currentPos = {
+            x: e.clientX - canvas.offsetLeft,
+            y: e.clientY - canvas.offsetTop
+        };
+        points.push(pixelToNDC(currentPos.x, currentPos.y));
+        drawThickLines();
+    }
 });
+
 gl.viewport(0, 0, canvas.width, canvas.height);
-// Button event listeners for adding points and clearing the canvas
+
 document.getElementById('addPoint').addEventListener('click', addUserPoint);
 document.getElementById('generateSegment').addEventListener('click', addRandomSegment);
 document.getElementById('clearCanvas').addEventListener('click', clearCanvas);
 
-// Initialize WebGL background color and clear the buffer
 gl.clearColor(1.0, 1.0, 1.0, 1.0);
 gl.clear(gl.COLOR_BUFFER_BIT);
