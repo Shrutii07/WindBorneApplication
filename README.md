@@ -1,7 +1,7 @@
 # WindBorneApplication
 
 
-# WebGL Line Drawing Application
+## WebGL Line Drawing Application
 
 This project is a simple WebGL-based line drawing application that allows users to draw thick lines on a canvas using various input methods.
 
